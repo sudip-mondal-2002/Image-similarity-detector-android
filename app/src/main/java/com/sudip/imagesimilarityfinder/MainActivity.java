@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,17 +23,25 @@ import com.chaquo.python.android.AndroidPlatform;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
-    String fileAddress1 = "";
-    String fileAddress2 = "";
+    Bitmap image1=null;
+    Bitmap image2=null;
     PyObject pyObject;
     String image = "";
     Button button;
+    public String convert(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream);
+        return Base64.encodeToString(outputStream.toByteArray(), Base64.DEFAULT);
+    }
     public void calculate(View view){
-//        PyObject obj = pyObject.callAttr("start",fileAddress1,fileAddress2);
-//        Log.i("info",obj.toString());
+        String imageString1 = convert(image1);
+        String imageString2 = convert(image2);
+        PyObject obj = pyObject.callAttr("start",imageString1,imageString2);
+        Log.i("info",obj.toString());
     }
     public void addImage(View view){
         image = view.getTag().toString();
@@ -52,18 +61,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode==1 && resultCode==RESULT_OK && data!=null){
-            Uri selectedImage = data.getData();
-            Log.i("info", selectedImage.toString());
             ImageView imageView;
-            if (image.equals("1")){
-                imageView = (ImageView) findViewById(R.id.image1);
-                fileAddress1 = selectedImage.toString();
-            }else{
-                imageView = (ImageView) findViewById(R.id.image2);
-                fileAddress2 = selectedImage.toString();
-            }
             try {
+                Uri selectedImage = data.getData();
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(),selectedImage);
+                if (image.equals("1")){
+                    imageView = (ImageView) findViewById(R.id.image1);
+                    image1 = bitmap;
+                }else{
+                    imageView = (ImageView) findViewById(R.id.image2);
+                    image2 = bitmap;
+                }
                 imageView.setImageBitmap(bitmap);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -71,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         }else{
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
         }
-        if ((! fileAddress1.equals("") && (!fileAddress2.equals("")))){
+        if (image1!=null && image2!=null){
             button.setEnabled(true);
         }
     }
