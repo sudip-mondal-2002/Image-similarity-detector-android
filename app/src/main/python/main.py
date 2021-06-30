@@ -1,4 +1,3 @@
-from skimage.transform import resize
 from skimage.metrics import structural_similarity
 import cv2
 import PIL.Image as Image
