@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     PyObject pyObject;
     String image = "";
     Button button;
+    TextView textView;
     public String convert(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream);
@@ -41,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         String imageString1 = convert(image1);
         String imageString2 = convert(image2);
         PyObject obj = pyObject.callAttr("start",imageString1,imageString2);
-        Log.i("info",obj.toString());
+        textView.setText(obj.toString());
     }
     public void addImage(View view){
         image = view.getTag().toString();
@@ -100,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
         Python py = Python.getInstance();
         pyObject = py.getModule("main");
 
+        textView  = (TextView) findViewById(R.id.textView);
         button = (Button) findViewById(R.id.button);
         button.setEnabled(false);
 
