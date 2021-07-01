@@ -42,8 +42,19 @@ public class MainActivity extends AppCompatActivity {
     public void calculate(View view){
         String imageString1 = convert(image1);
         String imageString2 = convert(image2);
-        PyObject obj = pyObject.callAttr("start",imageString1,imageString2);
-        textView.setText(obj.toString());
+        // running on new thread
+        Thread thd=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                PyObject obj = pyObject.callAttr("start", imageString1, imageString2);
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        textView.setText(obj.toString());
+                    }
+                });
+            }
+        });
+        thd.start();
     }
     public void addImage(View view){
         image = view.getTag().toString();

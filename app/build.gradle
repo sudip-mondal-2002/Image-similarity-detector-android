@@ -22,7 +22,7 @@ android {
         }
 
         python {
-            buildPython "C:/Users/sudip/AppData/Local/Programs/Python/Python37/python.exe"
+            buildPython "C:/Python39/python.exe"
             pip {
                 install "scikit-image"
                 install "opencv-python"
